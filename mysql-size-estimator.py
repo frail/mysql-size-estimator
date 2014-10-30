@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 """Mysql Size Estimator
 
 Usage:
@@ -21,7 +21,6 @@ import sys
 from mse.parser import Parser
 from mse.base import Table
 from mse.estimators import InnoDBEstimator
-from pyparsing import ParseException
 from docopt import docopt
 __version__ = '0.1'
 

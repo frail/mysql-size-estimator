@@ -128,7 +128,7 @@ class InnoDBEstimator:
         for column in self.table.columns.values():
             if column.nullable:
                 nullable_column_count += 1
-        total = int(math.ceil((7 + nullable_column_count) / 8.0))
+        total = int(math.ceil((nullable_column_count) / 8.0))
         details.append("[NULL-BITMAP] {} null columns [{}]".format(nullable_column_count, pp_byte(total)))
         return total, details
 
