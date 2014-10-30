@@ -43,7 +43,7 @@ def main():
 
     parser = Parser()
 
-    if arg.get("dummy"):
+    if arg.get("dummy") or arg.get("INPUT") == "dummy":
         table = Table("dummy")
     else:
         sqlString = read_file_or_stdin(arg.get('INPUT'))

@@ -37,22 +37,22 @@ CHARSET_SIZE_PER_CHAR = {
 
 }
 
-# tuple(default charset / default size / formula(length, charset) -> size)
+# tuple(default charset / sane default / formula(length, charset) -> size)
 STRING_TYPES = {
     'CHAR': ('latin1', 1, lambda l, c: l * c),
     'BINARY': ('latin1', 255, lambda l, c: l * c),
     'VARCHAR': ('utf8', 255, lambda l, c: (l * c) + 1 if l < 256 else (l * c) + 2),
     'VARBINARY': ('utf8', 255, lambda l, c: (l * c) + 1 if l < 256 else (l * c) + 2),
-    'TINYBLOB': ('latin1', 2 ** 8, lambda l, c: (l * c) + 1),
-    'TINYTEXT': ('utf8', 2 ** 8, lambda l, c: (l * c) + 1),
-    'BLOB': ('latin1', 2 ** 16, lambda l, c: (l * c) + 2),
-    'TEXT': ('utf8', 2 ** 16, lambda l, c: (l * c) + 2),
-    'MEDIUMBLOB': ('latin1', 2 ** 24, lambda l, c: (l * c) + 3),
-    'MEDIUMTEXT': ('utf8', 2 ** 32, lambda l, c: (l * c) + 4),
-    'LONGBLOB': ('latin1', 2 ** 32, lambda l, c: (l * c) + 4),
-    'LONGTEXT': ('utf8', 2 ** 24, lambda l, c: (l * c) + 3),
-    'ENUM': ('latin1', 2 ** 8, lambda l, _c: 1 if l <= 2 ** 8 else 2),
-    'SET': ('latin1', 4, lambda l, _c: int(math.log(l, 2)))
+    'TINYBLOB': ('latin1', 256, lambda l, c: (l * c) + 1),
+    'TINYTEXT': ('utf8', 256, lambda l, c: (l * c) + 1),
+    'BLOB': ('latin1', 512, lambda l, c: (l * c) + 2),
+    'TEXT': ('utf8', 512, lambda l, c: (l * c) + 2),
+    'MEDIUMBLOB': ('latin1', 1024, lambda l, c: (l * c) + 3),
+    'MEDIUMTEXT': ('utf8', 1024, lambda l, c: (l * c) + 4),
+    'LONGBLOB': ('latin1', 1024, lambda l, c: (l * c) + 4),
+    'LONGTEXT': ('utf8', 1024, lambda l, c: (l * c) + 3),
+    'ENUM': ('latin1', 256, lambda l, _c: 1 if l <= 256 else 2),
+    'SET': ('latin1', 4, lambda l, _c: int(math.log(l+1, 2)))
 }
 
 # formula(length) -> size
