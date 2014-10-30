@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import math
 
 # TODO: re-check all per character byte values (most of them are wrong)

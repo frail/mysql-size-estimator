@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import math
 from mse.base import Table
 from mse.util import pp_byte, pp_num

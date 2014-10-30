@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """Mysql Size Estimator
 
 Usage:
@@ -18,11 +18,11 @@ Options:
 
 """
 import sys
-from mse.parser import Parser
-from mse.base import Table
-from mse.estimators import InnoDBEstimator
 from docopt import docopt
-__version__ = '0.1'
+from .estimators import InnoDBEstimator
+from .parser import Parser
+from .base import Table
+
 
 
 def read_file_or_stdin(in_file):
@@ -38,8 +38,8 @@ def make_estimations(table, row_sizes, quiet):
     estimator = InnoDBEstimator(table)
     estimator.estimate(row_counts=row_sizes, print_details=not quiet)
 
-if __name__ == "__main__":
-    arg = docopt(__doc__,version=__version__)
+def main():
+    arg = docopt(__doc__)
 
     parser = Parser()
 
@@ -59,4 +59,3 @@ if __name__ == "__main__":
 
     row_sizes = [int(size) for size in arg.get("--row-size")]
     make_estimations(table, row_sizes, arg.get('--quiet'))
-

@@ -1,4 +1,7 @@
-import warnings
-import re
+# -*- coding: utf-8 -*-
+"""
+Python based command-line mysql size estimator
+"""
 
-warnings.filterwarnings('always', category=DeprecationWarning,module='^{0}\.'.format(re.escape(__name__)))
+__version__ = '0.1'
+__license__ = 'MIT License'

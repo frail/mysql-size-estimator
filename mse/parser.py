@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pyparsing as p
 from mse.constants import STRING_TYPES, NUMERIC_TYPES, DATE_TYPES
 from mse.base import Column, Index, Table
