@@ -8,19 +8,6 @@ Some utility stuff
 """
 
 import math
-from mse.constants import CHARSET_SIZE_PER_CHAR
-
-
-def get_effective_charset(charset):
-    """
-    get effective charset without collation
-    """
-    c = charset.lower()
-    for charset_name in CHARSET_SIZE_PER_CHAR.keys():
-        if c.startswith(charset_name):
-            return charset_name
-    raise ValueError("unknown charset : {}".format(charset))
-
 
 def pp_byte(byte):
     """
@@ -35,6 +22,18 @@ def pp_byte(byte):
         return '%s %s' % (s, size_name[i])
     else:
         return '0B'
+
+
+def to_str_list(stuff):
+    """
+    return given parameter as a list of string
+    """
+    try:
+        _iterator = iter(stuff)
+    except TypeError:
+        return [str(stuff)]
+    else:
+        return [str(x) for x in stuff]
 
 
 def pp_num(num):

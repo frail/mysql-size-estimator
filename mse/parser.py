@@ -2,6 +2,7 @@
 import pyparsing as p
 from mse.constants import STRING_TYPES, NUMERIC_TYPES, DATE_TYPES
 from mse.base import Column, Index, Table
+from mse.util import to_str_list
 
 DATA_TYPE_LITERALS = STRING_TYPES.keys() + NUMERIC_TYPES.keys() + DATE_TYPES.keys()
 
@@ -33,31 +34,42 @@ class Parser:
     # index definition
     _index_definition = \
         p.Optional(p.CaselessLiteral("PRIMARY").setResultsName("is_primary")) + \
+        p.Optional(p.CaselessLiteral("UNIQUE").setResultsName("is_unique")) + \
         p.CaselessLiteral("KEY") + p.Optional(_name.setResultsName("name")) + "(" + \
-        p.Group(p.delimitedList(_name)).setResultsName("columns") + ")"
+        p.delimitedList(_name).setResultsName("columns") + ")"
 
     # table definition
     _table_definition = \
-        p.CaselessLiteral("CREATE") + p.CaselessLiteral("TABLE") + _name.setResultsName("table_name") + \
+        p.CaselessLiteral("CREATE") + p.CaselessLiteral("TABLE") + \
+        p.Optional(_name.setResultsName("database_name") + ".") + \
+        _name.setResultsName("table_name") + \
         "(" + p.delimitedList(_column_definition | _index_definition) + ")" + \
         p.Optional(p.OneOrMore(_cs | _co | _en | _any))
 
     def _on_column_parse(self, tokens):
         length = len(tokens.get("enum_set_values", [])) if tokens.get("enum_set_values") else int(
             tokens.get("length", 0))
-        decimal = int(tokens.get("decimal", 0))
-        charset = tokens.get("charset", tokens.get("collate"))
+        decimal = int(tokens.get("decimal")) if tokens.get("decimal") else None
+        charset = tokens.get("charset")
+        collation = tokens.get("collate")
         nullable = tokens.get("not_null") is None
-
         column = Column(tokens["name"], tokens["type"], length=length, decimal=decimal, nullable=nullable,
-                        charset=charset)
+                        charset=charset, collation=collation)
         self.columns.append(column)
 
     def _on_index_parse(self, tokens):
         is_primary = tokens.get("is_primary") is not None
-        name = "primary" if is_primary else tokens.get("name")
-        columns = tokens.get("columns")
-        self.indexes.append(Index(name, columns, is_primary))
+        columns = to_str_list(tokens.get("columns"))
+
+        if is_primary:
+            name = 'primary'
+            is_unique = True
+        else:
+            name = tokens.get("name")
+            is_unique = tokens.get("is_unique") is not None
+
+        index = Index(name, columns, is_primary, is_unique)
+        self.indexes.append(index)
 
     def _on_table_parse(self, tokens):
         self.table_name = tokens.get("table_name")
@@ -74,6 +86,7 @@ class Parser:
         self.indexes = []
 
     def __init__(self):
+        self._reset()
         self._column_definition.setParseAction(self._on_column_parse)
         self._index_definition.setParseAction(self._on_index_parse)
         self._table_definition.setParseAction(self._on_table_parse)
@@ -81,8 +94,8 @@ class Parser:
     def parse_table(self, s):
         self._reset()
         self._table_definition.parseString(s)
-        charset = self.table_charset or self.table_collation
-        table = Table(self.table_name, charset=charset, engine=self.table_engine)
+        table = Table(self.table_name, engine=self.table_engine, charset=self.table_charset,
+                      collation=self.table_collation)
 
         for column in self.columns:
             table.add_or_update_column(column)
@@ -96,7 +109,6 @@ class Parser:
         self._reset()
         self._index_definition.parseString(s)
         return self.indexes[0]
-        pass
 
     def parse_column(self, s):
         self._reset()

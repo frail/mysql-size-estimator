@@ -1,17 +1,14 @@
 from mse.constants import *
-from mse.util import pp_byte, get_effective_charset
+from mse.charset import fix_charset_collation
 
 
 class Table:
-    def __init__(self, name, engine=None, charset=None):
+    def __init__(self, name, engine=None, charset=None, collation=None):
         self.name = name
         self.columns = {}
         self.indexes = {}
         self.engine = engine
-        self.charset = None
-
-        if charset:
-            self.charset = get_effective_charset(charset)
+        self.charset, self.collation = fix_charset_collation(charset, collation)
 
     def add_or_update_column(self, column):
         assert isinstance(column, Column)
@@ -27,10 +24,15 @@ class Table:
 
 
 class Index:
-    def __init__(self, name, columns, is_primary=False):
+    def __init__(self, name, columns, is_primary=False, is_unique=False):
+        name = name.strip()
+        assert name
+        assert isinstance(columns, list)
+        assert len(columns) >= 1
         self.name = name
         self.columns = columns
         self.is_primary = is_primary
+        self.is_unique = is_unique
 
     def __repr__(self):
         return self.__str__()
@@ -44,37 +46,30 @@ class Index:
 
 
 class Column:
-    def __init__(self, name, data_type, length=0, decimal=0, nullable=False, charset=None):
+    def __init__(self, name, data_type, length=0, decimal=None, nullable=False, charset=None, collation=None):
+        name = name.strip()
+        data_type = data_type.strip().upper()
+
+        assert name
+        assert data_type in STRING_TYPES or data_type in NUMERIC_TYPES or data_type in DATE_TYPES
+
         self.name = name
         self.data_type = data_type
         self.length = length
         self.decimal = decimal
         self.nullable = nullable
-        self.charset = None
-
-        if charset and (self.data_type in STRING_TYPES):
-            self.charset = get_effective_charset(charset)
-
-    def get_size(self):
-        if self.data_type in DATE_TYPES:
-            return DATE_TYPES[self.data_type]
-        elif self.data_type in NUMERIC_TYPES:
-            return NUMERIC_TYPES[self.data_type](self.length)
-        elif self.data_type in STRING_TYPES:
-            (default_charset, default_length, formula) = STRING_TYPES[self.data_type]
-            charset = self.charset or default_charset
-            length = self.length or default_length
-            return formula(CHARSET_SIZE_PER_CHAR[charset], length)
+        self.charset, self.collation = fix_charset_collation(charset, collation)
 
     def __repr__(self):
         return self.__str__()
 
     def __str__(self):
         nn = "" if self.nullable else "NOT NULL"
-        charset = "CHARACTER SET {0}".format(self.charset) if self.charset else ""
-        if self.decimal > 0:
+
+        if self.decimal is not None:
             return "{0} {1}({2},{3}) {4}".format(self.name, self.data_type, self.length, self.decimal, nn)
         elif self.data_type in DATE_TYPES or self.data_type in NUMERIC_TYPES:
             return "{0} {1} {2}".format(self.name, self.data_type, nn)
         elif self.data_type in STRING_TYPES:
-            return "{0} {1}({2}) {3} {4}".format(self.name, self.data_type, self.length, charset, nn)
+            charset_string = "CHARACTER SET {0} COLLATION {1}".format(self.charset, self.collation) if self.charset else ""
+            return "{0} {1}({2}) {3} {4}".format(self.name, self.data_type, self.length, charset_string, nn)

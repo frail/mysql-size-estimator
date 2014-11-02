@@ -19,7 +19,7 @@ Usages :
 
 or from sql file :
 
-    mysql-size-estimator create1.sql
+    mysql-size-estimator file create1.sql
     
 if you don't have a create script use dummy feature
 
@@ -33,15 +33,15 @@ if you have specific row counts to do the estimation you can write them aswell
 
 pull data directly from db :
 
-    mysql -e 'SHOW CREATE TABLE mysql.user\G' --skip-column-names | awk 'NR > 2' | mysql-size-estimator -
+    mysql -e 'SHOW CREATE TABLE mysql.user\G' --skip-column-names | awk 'NR > 2' | mysql-size-estimator file -
 
 check out what would change if you add/change an index (names should be unique) : 
      
-     ... | mysql-size-estimator - -i "KEY idx_category(category, created_at)"
+     ... | mysql-size-estimator file - -i "KEY idx_category(category, created_at)"
 
 if the results seems absurd check out string fields and re-arrange their size on fly. or even change their data type.
 
-    ... | mysql-size-estimator - -c "text1 VARCHAR(10)" -c "text2 TEXT(100)"
+    ... | mysql-size-estimator file - -c "text1 VARCHAR(10)" -c "text2 TEXT(100)"
 
 
 
@@ -53,7 +53,7 @@ Important links
 - http://blog.jcole.us/2013/01/07/the-physical-structure-of-innodb-index-pages/
 - http://blog.jcole.us/2013/01/10/the-physical-structure-of-records-in-innodb/
 - http://blog.jcole.us/2013/01/10/btree-index-structures-in-innodb/
-
+- http://www.informit.com/articles/article.aspx?p=328641&seqNum=3
 
 Contributing
 ~~~~~~~~~~~~

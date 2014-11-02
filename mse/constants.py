@@ -1,80 +1,72 @@
 # -*- coding: utf-8 -*-
 import math
 
-# TODO: re-check all per character byte values (most of them are wrong)
-CHARSET_SIZE_PER_CHAR = {
-    # Unicode Character Sets
-    'ucs2': 2,
-    'utf16': 2,
-    'utf32': 4,
-    'utf8': 3,
-    'utf8mb4': 4,  # TODO: this one uses 1-4 bytes but don't know how to put it in formula
+DEFAULT_CHARSET = 'latin1'
 
-    # West European Character Sets
-    'ascii': 1,
-    'cp850': 1,
-    'dec8': 1,
-    'hp8': 1,
-    'latin1': 1,
-    'macroman': 1,
-    'swe7': 1,
-
-    # Central European Character Sets
-    'cp1250': 1,
-    'cp852': 1,
-    'latin2': 1,
-    'macce': 1,
-
-    # South European and Middle East Character Sets
-    'armscii8': 1,
-    'cp1256': 1,
-    'geostd8': 1,
-    'greek': 1,
-    'hebrew': 1,
-    'latin5': 1,
-
-    # TODO : fill the rest
+DEFAULT_STRING_TYPE_LENGTHS = {
+    'CHAR': 1,
+    'BINARY': 255,
+    'VARCHAR': 255,
+    'VARBINARY': 255,
+    'TINYBLOB': 256,
+    'TINYTEXT': 256,
+    'BLOB': 512,
+    'TEXT': 2 ** 16,
+    'MEDIUMBLOB': 2 ** 24,
+    'MEDIUMTEXT': 2 ** 32,
+    'LONGBLOB': 2 ** 32,
+    'LONGTEXT': 2 ** 24,
+    'ENUM': 2 ** 8,
+    'SET': 4,
 
 }
 
-# tuple(default charset / sane default / formula(length, charset) -> size)
+
+def str_formula(adder):
+    return lambda l, c: (l * c) + adder
+
+
+def fixed(num):
+    return lambda _l: num
+
+# tuple(sane default length / formula(length, charset) -> size)
 STRING_TYPES = {
-    'CHAR': ('latin1', 1, lambda l, c: l * c),
-    'BINARY': ('latin1', 255, lambda l, c: l * c),
-    'VARCHAR': ('utf8', 255, lambda l, c: (l * c) + 1 if l < 256 else (l * c) + 2),
-    'VARBINARY': ('utf8', 255, lambda l, c: (l * c) + 1 if l < 256 else (l * c) + 2),
-    'TINYBLOB': ('latin1', 256, lambda l, c: (l * c) + 1),
-    'TINYTEXT': ('utf8', 256, lambda l, c: (l * c) + 1),
-    'BLOB': ('latin1', 512, lambda l, c: (l * c) + 2),
-    'TEXT': ('utf8', 512, lambda l, c: (l * c) + 2),
-    'MEDIUMBLOB': ('latin1', 1024, lambda l, c: (l * c) + 3),
-    'MEDIUMTEXT': ('utf8', 1024, lambda l, c: (l * c) + 4),
-    'LONGBLOB': ('latin1', 1024, lambda l, c: (l * c) + 4),
-    'LONGTEXT': ('utf8', 1024, lambda l, c: (l * c) + 3),
-    'ENUM': ('latin1', 256, lambda l, _c: 1 if l <= 256 else 2),
-    'SET': ('latin1', 4, lambda l, _c: int(math.log(l+1, 2)))
+    'CHAR': str_formula(0),
+    'BINARY': str_formula(0),
+    'VARCHAR': lambda l, c: (l * c) + 1 if l < 256 else (l * c) + 2,
+    'VARBINARY': lambda l, c: (l * c) + 1 if l < 256 else (l * c) + 2,
+    'TINYBLOB': str_formula(1),
+    'TINYTEXT': str_formula(1),
+    'BLOB': str_formula(2),
+    'TEXT': str_formula(2),
+    'MEDIUMBLOB': str_formula(3),
+    'MEDIUMTEXT': str_formula(3),
+    'LONGBLOB': str_formula(4),
+    'LONGTEXT': str_formula(4),
+    'ENUM': lambda l, _c: 1 if l <= 2 ** 8 else 2,
+    'SET': lambda l, _c: int(math.log(l, 2))
 }
 
 # formula(length) -> size
 NUMERIC_TYPES = {
     'BIT': lambda l: int((l + 7) / 8),
-    'TINYINT': lambda _l: 1,
-    'SMALLINT': lambda _l: 2,
-    'MEDIUMINT': lambda _l: 3,
-    'INT': lambda _l: 4,
-    'INTEGER': lambda _l: 4,
-    'BIGINT': lambda _l: 8,
-    'DOUBLE': lambda _l: 8,
-    'REAL': lambda _l: 8,
+    'TINYINT': fixed(1),
+    'SMALLINT': fixed(2),
+    'MEDIUMINT': fixed(3),
+    'INT': fixed(4),
+    'INTEGER': fixed(4),
+    'BIGINT': fixed(8),
+    'DOUBLE': fixed(8),
+    'REAL': fixed(8),
     'FLOAT': lambda l: 4 if (l <= 24) else 8,
-    'DECIMAL': lambda _l: 4,  # TODO:fix decimal formula
+    'DECIMAL': fixed(4),  # TODO:fix decimal formula
 }
 
 # formula(length) -> size
 DATE_TYPES = {
-    'DATE': 3,
-    'TIME': 3,
-    'DATETIME': 8,
-    'TIMESTAMP': 4,
-    'YEAR': 1,
+    'DATE': fixed(3),
+    'TIME': fixed(3),
+    'DATETIME': fixed(8),
+    'TIMESTAMP': fixed(4),
+    'YEAR': fixed(1),
 }
