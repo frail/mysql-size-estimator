@@ -4,7 +4,7 @@ from mse.constants import STRING_TYPES, NUMERIC_TYPES, DATE_TYPES
 from mse.base import Column, Index, Table
 from mse.util import to_str_list, strip_quotes as sq
 
-DATA_TYPE_LITERALS = STRING_TYPES.keys() + NUMERIC_TYPES.keys() + DATE_TYPES.keys()
+DATA_TYPE_LITERALS = list(STRING_TYPES) + list(NUMERIC_TYPES) + list(DATE_TYPES)
 
 
 class Parser:

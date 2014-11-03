@@ -1,9 +1,14 @@
-from unittest import TestCase
+import platform
+
+if platform.python_version() < '2.7':
+    unittest = __import__('unittest2')
+else:
+    import unittest
 
 from mse.charset import get_charset, get_collation, fix_charset_collation
 
 
-class TestCharset(TestCase):
+class TestCharset(unittest.TestCase):
     def test_get_charset(self):
         charset2 = get_charset('bla')
         self.assertIsNone(charset2)
@@ -26,9 +31,9 @@ class TestCharset(TestCase):
         self.assertRaises(ValueError, fix_charset_collation, "abc", "utf8_general_ci")
         self.assertRaises(ValueError, fix_charset_collation, "latin1", "utf8_general_ci")
 
-        self.assertItemsEqual([None, None], fix_charset_collation(None, None))
-        self.assertItemsEqual(["utf8", "utf8_general_ci"], fix_charset_collation("UTF8", None))
-        self.assertItemsEqual(["utf8", "utf8_general_ci"], fix_charset_collation(None, "utf8_GENERAL_ci"))
-        self.assertItemsEqual(["utf8", "utf8_general_ci"], fix_charset_collation("utf8", "utf8_GENERAL_ci"))
+        self.assertSequenceEqual([None, None], fix_charset_collation(None, None))
+        self.assertSequenceEqual(["utf8", "utf8_general_ci"], fix_charset_collation("UTF8", None))
+        self.assertSequenceEqual(["utf8", "utf8_general_ci"], fix_charset_collation(None, "utf8_GENERAL_ci"))
+        self.assertSequenceEqual(["utf8", "utf8_general_ci"], fix_charset_collation("utf8", "utf8_GENERAL_ci"))
 
 

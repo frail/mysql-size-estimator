@@ -1,8 +1,13 @@
-from unittest import TestCase
+import platform
+
+if platform.python_version() < '2.7':
+    unittest = __import__('unittest2')
+else:
+    import unittest
 from mse.base import Table, Column, Index
 
 
-class TestTable(TestCase):
+class TestTable(unittest.TestCase):
     def setUp(self):
         self.table = Table("test1")
 
@@ -29,7 +34,7 @@ class TestTable(TestCase):
         self.assertEquals("INT", self.table.columns['e7'].data_type)
 
 
-class TestColumn(TestCase):
+class TestColumn(unittest.TestCase):
     def test_create_fails(self):
         self.assertRaises(AssertionError, Column, "", "int")
         self.assertRaises(AssertionError, Column, "test", "int2")
@@ -45,7 +50,7 @@ class TestColumn(TestCase):
         self.assertIsNone(c.collation)
 
 
-class TestIndex(TestCase):
+class TestIndex(unittest.TestCase):
     def test_create_fail(self):
         self.assertRaises(AssertionError, Index, " ", ["a", "b"])
         self.assertRaises(AssertionError, Index, "test", "column")
@@ -54,6 +59,6 @@ class TestIndex(TestCase):
     def test_defaults(self):
         i = Index("test", ['a', 'b', 'c'])
         self.assertEquals("test", i.name)
-        self.assertItemsEqual(['a', 'b', 'c'], i.columns)
+        self.assertSequenceEqual(['a', 'b', 'c'], i.columns)
         self.assertEquals(False, i.is_primary)
         self.assertEquals(False, i.is_unique)
