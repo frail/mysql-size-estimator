@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/frail/mysql-size-estimator.svg)](https://travis-ci.org/frail/mysql-size-estimator)
+[![Build Status](https://travis-ci.org/frail/mysql-size-estimator.svg?branch=master)](https://travis-ci.org/frail/mysql-size-estimator)
 
 mysql-size-estimator
 ===================
