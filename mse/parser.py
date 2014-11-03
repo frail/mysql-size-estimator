@@ -2,7 +2,7 @@
 import pyparsing as p
 from mse.constants import STRING_TYPES, NUMERIC_TYPES, DATE_TYPES
 from mse.base import Column, Index, Table
-from mse.util import to_str_list
+from mse.util import to_str_list, strip_quotes as sq
 
 DATA_TYPE_LITERALS = STRING_TYPES.keys() + NUMERIC_TYPES.keys() + DATE_TYPES.keys()
 
@@ -11,7 +11,7 @@ class Parser:
     _quoted = p.dblQuotedString | p.sglQuotedString
     _name = p.Word(p.alphas + "_", p.alphanums + "_") | p.QuotedString("`")
     _nums = p.Word(p.nums)
-    _any = _name | _quoted
+    _any = _name | _quoted | _nums
 
     # not null / charset meta information
     _nn = (p.CaselessLiteral("NOT") + p.CaselessLiteral("NULL")).setResultsName("not_null")
@@ -50,8 +50,8 @@ class Parser:
         length = len(tokens.get("enum_set_values", [])) if tokens.get("enum_set_values") else int(
             tokens.get("length", 0))
         decimal = int(tokens.get("decimal")) if tokens.get("decimal") else None
-        charset = tokens.get("charset")
-        collation = tokens.get("collate")
+        charset = sq(tokens.get("charset"))
+        collation = sq(tokens.get("collate"))
         nullable = tokens.get("not_null") is None
         column = Column(tokens["name"], tokens["type"], length=length, decimal=decimal, nullable=nullable,
                         charset=charset, collation=collation)
@@ -73,9 +73,9 @@ class Parser:
 
     def _on_table_parse(self, tokens):
         self.table_name = tokens.get("table_name")
-        self.table_collation = tokens.get("table_collation")
-        self.table_charset = tokens.get("charset")
-        self.table_engine = tokens.get("engine")
+        self.table_collation = sq(tokens.get("collate"))
+        self.table_charset = sq(tokens.get("charset"))
+        self.table_engine = sq(tokens.get("engine"))
 
     def _reset(self):
         self.table_name = None

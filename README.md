@@ -53,6 +53,7 @@ Important links
 - http://blog.jcole.us/2013/01/07/the-physical-structure-of-innodb-index-pages/
 - http://blog.jcole.us/2013/01/10/the-physical-structure-of-records-in-innodb/
 - http://blog.jcole.us/2013/01/10/btree-index-structures-in-innodb/
+- https://github.com/jeremycole/innodb_diagrams
 - http://www.informit.com/articles/article.aspx?p=328641&seqNum=3
 
 Contributing

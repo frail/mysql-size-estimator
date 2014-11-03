@@ -34,7 +34,22 @@ class TestParser(TestCase):
         c2 = self.p.parse_column("`f2` Decimal(10,1) NOT NULL DEFAULT '0.2'")
         self.assertEquals(c2, Column("f2", "DECIMAL", length=10, decimal=1, nullable=False))
 
-
+        c3 = self.p.parse_column("f3 VARCHAR")
+        self.assertEquals(c3, Column("f3", "VARCHAR", length=0))
 
     def test_parse_table(self):
-        pass
+        t1 = self.p.parse_table("create table test.t1 (id INT) engine=INNODB CHARACTER SET 'UTF8'")
+        self.assertEquals("t1", t1.name)
+        self.assertItemsEqual([Column("id", "int")], t1.columns.values())
+        self.assertEquals("INNODB", t1.engine)
+        self.assertEquals("utf8", t1.charset)
+        self.assertEquals("utf8_general_ci", t1.collation)
+
+
+        t2 = self.p.parse_table("create table `test`.`t2` (`id` INT NOT NULL DEFAULT 0, PRIMARY KEY (`id`)) collate utf8_general_ci ENGINE=\"MyISAM\"")
+        self.assertEquals("t2", t2.name)
+        self.assertItemsEqual([Column("id", "int", nullable=False)], t2.columns.values())
+        self.assertItemsEqual([Index("primary", ['id'], is_primary=True, is_unique=True)], t2.indexes.values())
+        self.assertEquals("MyISAM", t2.engine)
+        self.assertEquals("utf8", t2.charset)
+        self.assertEquals("utf8_general_ci", t2.collation)

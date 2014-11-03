@@ -3,6 +3,8 @@ import math
 
 DEFAULT_CHARSET = 'latin1'
 
+# these sane (default) lengths of string type fields
+# feel free to change / overwrite them
 DEFAULT_STRING_TYPE_LENGTHS = {
     'CHAR': 1,
     'BINARY': 255,
@@ -10,15 +12,14 @@ DEFAULT_STRING_TYPE_LENGTHS = {
     'VARBINARY': 255,
     'TINYBLOB': 256,
     'TINYTEXT': 256,
-    'BLOB': 512,
-    'TEXT': 2 ** 16,
-    'MEDIUMBLOB': 2 ** 24,
-    'MEDIUMTEXT': 2 ** 32,
-    'LONGBLOB': 2 ** 32,
-    'LONGTEXT': 2 ** 24,
-    'ENUM': 2 ** 8,
+    'BLOB': 1024,
+    'TEXT': 1024,
+    'MEDIUMBLOB': 2048,
+    'MEDIUMTEXT': 2048,
+    'LONGBLOB': 4096,
+    'LONGTEXT': 4096,
+    'ENUM': 10,
     'SET': 4,
-
 }
 
 

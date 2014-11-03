@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 _SHOW_CHARACTER_SET = """
 | big5     | Big5 Traditiona Chinese    | big5_chinese_ci     |      2 |
 | dec8     | DEC West European           | dec8_swedish_ci     |      1 |

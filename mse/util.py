@@ -9,6 +9,7 @@ Some utility stuff
 
 import math
 
+
 def pp_byte(byte):
     """
     pretty prints byte value
@@ -22,6 +23,12 @@ def pp_byte(byte):
         return '%s %s' % (s, size_name[i])
     else:
         return '0B'
+
+
+def strip_quotes(s):
+    if s and len(s) >= 2 and s[0] == s[-1] and s[0] in ["\"", "'", "`"]:
+        return s[1:-1]
+    return s
 
 
 def to_str_list(stuff):
