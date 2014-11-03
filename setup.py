@@ -2,6 +2,7 @@
 
 import sys
 import mse
+import platform
 
 try:
     from setuptools import setup
@@ -16,6 +17,11 @@ AUTHOR = u'Özgür Orhan'
 AUTHOR_EMAIL = "ozgur.orhan@gmail.com"
 URL = "http://github.com/frail/mysql-size-estimator"
 VERSION = __import__(PACKAGE).__version__
+
+# Test requirements
+tests_require = ['pytest']
+if platform.python_version() < '2.7':
+    tests_require.append("unittest2")
 
 
 def readme():
@@ -45,6 +51,7 @@ class PyTest(TestCommand):
     def run_tests(self):
         # import here, cause outside the eggs aren't loaded
         import pytest
+
         sys.exit(pytest.main(self.test_args))
 
 
@@ -59,7 +66,7 @@ setup(
     license=mse.__license__,
     packages=['mse'],
     entry_points={'console_scripts': ['mysql-size-estimator = mse.__main__:main']},
-    tests_require=['pytest'],
+    tests_require=tests_require,
     cmdclass={'test': PyTest},
     install_requires=requirements(),
     classifiers=[
