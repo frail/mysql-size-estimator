@@ -5,8 +5,9 @@ import mse
 
 try:
     from setuptools import setup
+    from setuptools.command.test import test as TestCommand
 except ImportError:
-    from distutils.core import setup
+    from distutils.core import setup, Command as TestCommand
 
 PACKAGE = "mse"
 NAME = "mysql-size-estimator"
@@ -34,6 +35,19 @@ def requirements():
 
     return install_requires
 
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        # import here, cause outside the eggs aren't loaded
+        import pytest
+        pytest.main(self.test_args)
+
+
 setup(
     name=NAME,
     version=VERSION,
@@ -45,6 +59,8 @@ setup(
     license=mse.__license__,
     packages=['mse'],
     entry_points={'console_scripts': ['mysql-size-estimator = mse.__main__:main']},
+    tests_require=['pytest'],
+    cmdclass={'test': PyTest},
     install_requires=requirements(),
     classifiers=[
         "License :: OSI Approved :: MIT License",
@@ -52,8 +68,8 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7"
-        ],
+    ],
     keywords=['mysql', 'size', 'estimate', 'size-estimator', 'innodb'],
     include_package_data=True,
     zip_safe=False,
-    )
+)
