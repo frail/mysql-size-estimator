@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/frail/mysql-size-estimator.svg?branch=master)](https://travis-ci.org/frail/mysql-size-estimator)
+[![Coverage Status](https://coveralls.io/repos/frail/mysql-size-estimator/badge.png?branch=master)](https://coveralls.io/r/frail/mysql-size-estimator?branch=master)
 
 mysql-size-estimator
 ===================
