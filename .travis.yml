@@ -8,5 +8,5 @@ install:
   - pip install coveralls
 script:
   - python setup.py test
-  - coverage run setup.py test
+  - coverage run --source=mse setup.py test
 after_success: coveralls
