@@ -1,3 +1,4 @@
+from ordereddict import OrderedDict
 from mse.constants import *
 from mse.charset import fix_charset_collation
 
@@ -13,8 +14,8 @@ class EqualityMixin:
 class Table(EqualityMixin):
     def __init__(self, name, engine=None, charset=None, collation=None):
         self.name = name
-        self.columns = {}
-        self.indexes = {}
+        self.columns = OrderedDict()
+        self.indexes = OrderedDict()
         self.engine = engine
         self.charset, self.collation = fix_charset_collation(charset, collation)
 
