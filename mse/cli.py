@@ -29,7 +29,11 @@ from .base import Table
 from .charset import fix_charset_collation
 
 
-class CliParser:
+class CliSQLParseException(SystemExit):
+    pass
+
+
+class Cli:
     def __init__(self, args):
         self._parser = Parser()
         self.table = None
@@ -55,7 +59,10 @@ class CliParser:
     def _read_table_from_stdin(self):
         data = sys.stdin.readlines()
         table_str = " ".join(data)
-        self.table = self._parser.parse_table(table_str)
+        try:
+            self.table = self._parser.parse_table(table_str)
+        except:
+            raise CliSQLParseException("Cannot parse given table")
 
     def _read_table_from_file(self, filename):
         with open(filename, "r") as f:
@@ -64,12 +71,18 @@ class CliParser:
 
     def _update_columns(self, args):
         for column_string in args.get("--column"):
-            column = self._parser.parse_column(column_string)
+            try:
+                column = self._parser.parse_column(column_string)
+            except:
+                raise CliSQLParseException("Cannot parse given column")
             self.table.add_or_update_column(column)
 
     def _update_indexes(self, args):
         for index_string in args.get("--index"):
-            index = self._parser.parse_index(index_string)
+            try:
+                index = self._parser.parse_index(index_string)
+            except:
+                raise CliSQLParseException("Cannot parse given index")
             self.table.add_or_update_index(index)
 
     def _update_charset(self, args):
@@ -86,5 +99,5 @@ def make_estimations(table, row_sizes, quiet):
 
 def main():
     args = docopt(__doc__)
-    parsed = CliParser(args)
+    parsed = Cli(args)
     make_estimations(parsed.table, parsed.report_row_sizes, parsed.is_quiet)

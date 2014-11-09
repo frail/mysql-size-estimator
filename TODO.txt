@@ -1,0 +1,17 @@
+basics:
+------------------------------
+* get test covarage to 90% at least and keep it there
+* get rid of print(), a decent logging would be nice
+* exception handling / custom exceptions
+* should support partial index
+* cli tests
+* estimator tests
+* estimator is not working properly, fixes on unicode logic is necessary
+* index calculations is too simple, should be fixed for innodb at least (leafs etc)
+
+features:
+------------------------------
+* beside dummy / file let the application connect to mysql and get table meta from there
+* feature to sample data from source to guess data behavior (null field ratio / string field's length)
+* overlapping index warning (?)
+* myisam (or other engine) estimator (?)

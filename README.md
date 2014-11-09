@@ -62,6 +62,8 @@ Important links
 Contributing
 ~~~~~~~~~~~~
 
-I would be very happy if you do contribute.
+I would be very happy if you decide to contribute.
 
-Please make sure you make the code a little less complicated with each commit.
+Check out TODO.txt (my simple todo list) if you want to get an opinion of what I want to achieve. I am also open to ideas.
+
+Please make sure you make the code a little less complicated with each commit. And please try not to lower test coverage.
