@@ -11,7 +11,6 @@ from docopt import docopt, DocoptExit
 
 
 class TestCli(unittest.TestCase):
-
     def test_fail_no_param(self):
         self.assertRaises(DocoptExit, docopt, mse.cli.__doc__)
 
@@ -20,17 +19,17 @@ class TestCli(unittest.TestCase):
         self.assertRaises(DocoptExit, docopt, mse.cli.__doc__, ['file'])
 
     def test_dummy(self):
-        args = docopt(mse.cli.__doc__, ['dummy', '-c', 'id INT'])
+        args = docopt(mse.cli.__doc__, ['dummy', '-c', 'id INT', '-i', 'PRIMARY KEY (id)'])
         parsed = Cli(args)
         self.assertEqual("dummy", parsed.table.name)
-        self.assertEqual(1, len(parsed.table.columns))
-        self.assertEqual(0, len(parsed.table.indexes))
+        self.assertEqual(mse.base.Column('id', 'INT'), parsed.table.columns.get('id'))
+        self.assertEqual(mse.base.Index('primary', ['id'], is_primary=True), parsed.table.indexes.get('primary'))
 
     def test_dummy_fail_bad_definition(self):
         args1 = docopt(mse.cli.__doc__, ['dummy', '-c', 'id'])
         self.assertRaises(CliSQLParseException, Cli, args1)
 
-        args2 = docopt(mse.cli.__doc__, ['dummy', '-c','id INT', '-i', 'id'])
+        args2 = docopt(mse.cli.__doc__, ['dummy', '-c', 'id INT', '-i', 'id'])
         self.assertRaises(CliSQLParseException, Cli, args2)
 
 

@@ -44,7 +44,8 @@ class Index(EqualityMixin):
         self.name = name
         self.columns = columns
         self.is_primary = is_primary
-        self.is_unique = is_unique
+        # Overwrite is_unique when it's primary
+        self.is_unique = is_primary or is_unique
 
     def __repr__(self):
         return self.__str__()
@@ -85,5 +86,5 @@ class Column(EqualityMixin):
         elif self.data_type in DATE_TYPES or self.data_type in NUMERIC_TYPES:
             return "{0} {1} {2}".format(self.name, self.data_type, nn).strip()
         elif self.data_type in STRING_TYPES:
-            cs = "CHARACTER SET {0} COLLATION {1}".format(self.charset,self.collation) if self.charset else ""
+            cs = "CHARACTER SET {0} COLLATION {1}".format(self.charset, self.collation) if self.charset else ""
             return "{0} {1}({2}) {3} {4}".format(self.name, self.data_type, self.length, cs, nn).strip()
