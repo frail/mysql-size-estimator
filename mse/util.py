@@ -9,20 +9,19 @@ Some utility stuff
 
 import math
 
+BYTE_SUFFIXES = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 
-def pp_byte(byte):
+def pp_byte(nbytes):
     """
     pretty prints byte value
     """
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-
-    if byte > 0:
-        i = min(int(math.floor(math.log(byte, 1024))), len(size_name) - 1)
-        p = math.pow(1024, i)
-        s = round(byte / p, 2)
-        return '%s %s' % (s, size_name[i])
-    else:
-        return '0B'
+    if nbytes == 0: return '0 B'
+    i = 0
+    while nbytes >= 1024 and i < len(BYTE_SUFFIXES)-1:
+        nbytes /= 1024.
+        i += 1
+    f = ('%.2f' % nbytes).rstrip('0').rstrip('.')
+    return '%s %s' % (f, BYTE_SUFFIXES[i])
 
 
 def strip_quotes(s):
@@ -45,14 +44,12 @@ def to_str_list(stuff):
 
 def pp_num(num):
     """
-    pretty prints number
+    pretty prints number with commas
     """
-    if num > 0:
-        size_name = ("", "K", "M", "T")
-        i = min(int(math.floor(math.log(num, 1000))), len(size_name) - 1)
-        p = math.pow(1000, i)
-        s = round(num / p, 2)
-        return '%s %s' % (s, size_name[i])
-    else:
-        return "%s" % num
+    s = '%d' % num
+    groups = []
+    while s and s[-1].isdigit():
+        groups.append(s[-3:])
+        s = s[:-3]
+    return s + ','.join(reversed(groups))
 

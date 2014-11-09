@@ -49,6 +49,8 @@ class Index(EqualityMixin):
         cols = ",".join(self.columns)
         if self.is_primary:
             return "PRIMARY KEY ({0})".format(cols)
+        elif self.is_unique:
+            return "UNIQUE KEY {0} ({1})".format(self.name, cols)
         else:
             return "KEY {0} ({1})".format(self.name, cols)
 
@@ -75,10 +77,9 @@ class Column(EqualityMixin):
         nn = "" if self.nullable else "NOT NULL"
 
         if self.decimal is not None:
-            return "{0} {1}({2},{3}) {4}".format(self.name, self.data_type, self.length, self.decimal, nn)
+            return "{0} {1}({2},{3}) {4}".format(self.name, self.data_type, self.length, self.decimal, nn).strip()
         elif self.data_type in DATE_TYPES or self.data_type in NUMERIC_TYPES:
-            return "{0} {1} {2}".format(self.name, self.data_type, nn)
+            return "{0} {1} {2}".format(self.name, self.data_type, nn).strip()
         elif self.data_type in STRING_TYPES:
-            charset_string = "CHARACTER SET {0} COLLATION {1}".format(self.charset,
-                                                                      self.collation) if self.charset else ""
-            return "{0} {1}({2}) {3} {4}".format(self.name, self.data_type, self.length, charset_string, nn)
+            cs = "CHARACTER SET {0} COLLATION {1}".format(self.charset,self.collation) if self.charset else ""
+            return "{0} {1}({2}) {3} {4}".format(self.name, self.data_type, self.length, cs, nn).strip()
