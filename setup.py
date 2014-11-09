@@ -65,7 +65,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     license=mse.__license__,
     packages=['mse'],
-    entry_points={'console_scripts': ['mysql-size-estimator = mse.__main__:main']},
+    entry_points={'console_scripts': ['mysql-size-estimator = mse.__init__:main']},
     tests_require=tests_require,
     cmdclass={'test': PyTest},
     install_requires=requirements(),
