@@ -75,14 +75,14 @@ class InnoDBEstimator:  # TODO: make a base class and extend this
 
 
     def estimate(self, row_counts, print_details=True):
-        print "Estimations for table : [{}] ".format(self.table.name)
+        print("Estimations for table : [{}] ".format(self.table.name))
 
         # if row sizes is not specified, use defaults
         if not row_counts or len(row_counts) == 0:
             row_counts = DEFAULT_ROW_SIZES
         # print details
         if print_details:
-            print self.LINE_BREAK
+            print(self.LINE_BREAK)
             # create some more details
             d_p = self.row_data_size * 100 / self.row_total_size
             i_p = self.row_index_size * 100 / self.row_total_size
@@ -92,20 +92,20 @@ class InnoDBEstimator:  # TODO: make a base class and extend this
 
             # print them out
             for detail in self.details:
-                print detail
+                print(detail)
 
-            print self.LINE_BREAK
+            print(self.LINE_BREAK)
 
         estimate_table_template = "{0: <15}  |  {1: <20}  |  {2: <20}  |  {3: <20}"
 
-        print estimate_table_template.format("ROWS", "NO FRAGMENTATION", "MIN FRAGMENTATION", "MAX FRAGMENTATION")
+        print(estimate_table_template.format("ROWS", "NO FRAGMENTATION", "MIN FRAGMENTATION", "MAX FRAGMENTATION"))
         for rows in row_counts:
             t = self.row_total_size
-            print estimate_table_template.format(
+            print(estimate_table_template.format(
                 pp_num(rows), pp_byte(t * rows),
                 pp_byte(t * (1 + INNODB_MIN_PAGE_FILL_RATE) * rows),
                 pp_byte(t * (1 + INNODB_MAX_PAGE_FILL_RATE) * rows),
-            )
+            ))
 
     def get_row_data_size(self):
         details = []
