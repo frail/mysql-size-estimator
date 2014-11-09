@@ -6,7 +6,7 @@ mysql-size-estimator
 
 mysql-size-estimator is a simple tool to estimate mysql table size for given table schema. It's not 100% accurate nor it could ever be. It's much better to use this tool to give an insight.
 
-The string fields would assume that it would be used fully. Which means currently a utf8 string field with 10 character limit would assume that you would be filling every row with 10 3 bytes characters. I am planing to make it more better soon.
+The string fields would consume its limits. Assuming you have a utf-8 string field with 10 character limit; estimator would calculate like this field is fully filled with 3 byte characters. (I am planing to make it better and sane soon.)
 
 Install :
 ===============
