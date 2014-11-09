@@ -1,4 +1,7 @@
-from ordereddict import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 from mse.constants import *
 from mse.charset import fix_charset_collation
 

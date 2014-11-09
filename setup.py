@@ -21,7 +21,7 @@ VERSION = __import__(PACKAGE).__version__
 # Test requirements
 tests_require = ['pytest']
 if platform.python_version() < '2.7':
-    tests_require.append("unittest2")
+    tests_require.append('unittest2')
 
 
 def readme():
@@ -39,6 +39,10 @@ def requirements():
     if 'win32' in str(sys.platform).lower():
         install_requires.append('colorama>=0.2.4')
 
+    # add ordereddict for 2.6
+    if platform.python_version() < '2.7':
+        install_requires.append('ordereddict>=1.1')
+
     return install_requires
 
 
@@ -51,7 +55,6 @@ class PyTest(TestCommand):
     def run_tests(self):
         # import here, cause outside the eggs aren't loaded
         import pytest
-
         sys.exit(pytest.main(self.test_args))
 
 
