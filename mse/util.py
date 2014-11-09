@@ -34,6 +34,8 @@ def to_str_list(stuff):
     """
     return given parameter as a list of string
     """
+    if isinstance(stuff, str):
+        return [stuff]
     try:
         _iterator = iter(stuff)
     except TypeError:

@@ -7,6 +7,7 @@ else:
 
 from mse.util import *
 
+
 class TestUtil(unittest.TestCase):
 
     def test_pp_byte(self):
@@ -14,7 +15,6 @@ class TestUtil(unittest.TestCase):
         self.assertEqual("1 KB", pp_byte(1024))
         self.assertEqual("1.01 KB", pp_byte(1030))
         self.assertEqual("1.99 MB", pp_byte(2*(1024*1019)))
-
 
     def test_strip_quotes(self):
         self.assertEqual("a", strip_quotes("\"a\""))
@@ -24,9 +24,10 @@ class TestUtil(unittest.TestCase):
         self.assertEqual("\"a", strip_quotes("\"a"))
 
     def test_to_str_list(self):
-        self.assertSequenceEqual(['a'], to_str_list('a'))
-        self.assertSequenceEqual(['1','2'], to_str_list([1,2]))
-        self.assertSequenceEqual(['1','2'], to_str_list(['1','2']))
+        self.assertSequenceEqual(['abc'], to_str_list('abc'))
+        self.assertSequenceEqual(['1', '2'], to_str_list([1, 2]))
+        self.assertSequenceEqual(['123'], to_str_list(123))
+        self.assertSequenceEqual(['1', '2'], to_str_list(['1', '2']))
 
     def test_pp_num(self):
         self.assertEqual("1,000", pp_num(1000))
