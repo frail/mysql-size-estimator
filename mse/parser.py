@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pyparsing as p
-from mse.constants import STRING_TYPES, NUMERIC_TYPES, DATE_TYPES
-from mse.base import Column, Index, Table
+from mse.constants import *
+from mse.base import Column, Index, Table, IndexColumn
 from mse.util import to_str_list, strip_quotes as sq
 
 DATA_TYPE_LITERALS = list(STRING_TYPES) + list(NUMERIC_TYPES) + list(DATE_TYPES)
@@ -32,11 +32,16 @@ class Parser:
         _name.setResultsName("name") + _column_data_type + p.Optional(p.OneOrMore(_nn | _cs | _co | _any))
 
     # index definition
+    _index_column = \
+        _name.setResultsName("column_name") + \
+        p.Optional("(" + _nums.setResultsName("column_index_length") + ")") + \
+        p.Optional(p.oneOf([DIRECTION_ASC, DIRECTION_DESC]).setResultsName("column_index_direction"))
+
     _index_definition = \
         p.Optional(p.CaselessLiteral("PRIMARY").setResultsName("is_primary")) + \
         p.Optional(p.CaselessLiteral("UNIQUE").setResultsName("is_unique")) + \
-        p.CaselessLiteral("KEY") + p.Optional(_name.setResultsName("name")) + "(" + \
-        p.delimitedList(_name).setResultsName("columns") + ")"
+        p.oneOf(['KEY', 'INDEX'], caseless=True) + p.Optional(_name.setResultsName("name")) + "(" + \
+        p.Group(p.delimitedList(_index_column)).setResultsName("columns") + ")"
 
     # table definition
     _table_definition = \
@@ -59,7 +64,6 @@ class Parser:
 
     def _on_index_parse(self, tokens):
         is_primary = tokens.get("is_primary") is not None
-        columns = to_str_list(tokens.get("columns"))
 
         if is_primary:
             name = 'primary'
@@ -68,8 +72,18 @@ class Parser:
             name = tokens.get("name")
             is_unique = tokens.get("is_unique") is not None
 
-        index = Index(name, columns, is_primary, is_unique)
+        columns = self.index_columns[:] # copy and remove array
+        index = Index(name, columns, is_primary=is_primary, is_unique=is_unique)
+
+        self.index_columns = []
         self.indexes.append(index)
+
+    def _on_index_column_parse(self, tokens):
+        column_name = tokens.get('column_name')
+        column_index_length = int(tokens.get('column_index_length', '0'))
+        column_index_direction = tokens.get('column_index_direction', DIRECTION_ASC)
+        i = IndexColumn(column_name, length=column_index_length, direction=column_index_direction)
+        self.index_columns.append(i)
 
     def _on_table_parse(self, tokens):
         self.table_name = tokens.get("table_name")
@@ -84,10 +98,12 @@ class Parser:
         self.table_collation = None
         self.columns = []
         self.indexes = []
+        self.index_columns = []
 
     def __init__(self):
         self._reset()
         self._column_definition.setParseAction(self._on_column_parse)
+        self._index_column.setParseAction(self._on_index_column_parse)
         self._index_definition.setParseAction(self._on_index_parse)
         self._table_definition.setParseAction(self._on_table_parse)
 

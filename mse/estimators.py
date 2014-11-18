@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import copy
 from mse.base import Table
 from mse.constants import *
 from mse.charset import get_charset
@@ -57,8 +58,11 @@ class InnoDBEstimator:  # TODO: make a base class and extend this
     def calculate_index_size(self, index):
         # note : does not add primary index size !
         total = 0
-        for column_name in index.columns:
-            column = self.table.columns.get(column_name)
+        for index_column in index.columns:
+            column = self.table.columns.get(index_column.name)
+            if index_column.length > 0:
+                column = copy.copy(column)
+                column.length = index_column.length
             total += self.calculate_column_size(column)
         return total
 

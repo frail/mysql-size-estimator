@@ -4,7 +4,7 @@ if platform.python_version() < '2.7':
     unittest = __import__('unittest2')
 else:
     import unittest
-from mse.base import Table, Column, Index
+from mse.base import Table, Column, Index, IndexColumn
 
 
 class TestTable(unittest.TestCase):
@@ -34,7 +34,7 @@ class TestTable(unittest.TestCase):
         self.assertEquals("INT", self.table.columns['e7'].data_type)
 
     def test_add_index_to_unknown_column(self):
-        self.assertRaises(ValueError, self.table.add_or_update_index, Index("test", ['unknown_column']))
+        self.assertRaises(ValueError, self.table.add_or_update_index, Index("test", [IndexColumn('unknown_column')]))
 
 
 class TestColumn(unittest.TestCase):
@@ -73,16 +73,16 @@ class TestIndex(unittest.TestCase):
     def test_defaults(self):
         i = Index("test", ['a', 'b', 'c'])
         self.assertEquals("test", i.name)
-        self.assertSequenceEqual(['a', 'b', 'c'], i.columns)
+        self.assertSequenceEqual([IndexColumn('a'), IndexColumn('b'), IndexColumn('c')], i.columns)
         self.assertEquals(False, i.is_primary)
         self.assertEquals(False, i.is_unique)
 
     def test_to_string(self):
-        i1 = Index("primary", ['id'], is_primary=True)
-        i2 = Index("idx_1", ['a', 'b'], is_primary=False, is_unique=False)
-        i3 = Index("idx_2", ['b'], is_primary=False, is_unique=True)
+        i1 = Index("primary", [IndexColumn('id')], is_primary=True)
+        i2 = Index("idx_1", [IndexColumn('a', 10, 'DESC'), 'b'], is_primary=False, is_unique=False)
+        i3 = Index("idx_2", ['b'], is_unique=True)
         self.assertEqual("PRIMARY KEY (id)", str(i1))
-        self.assertEqual("KEY idx_1 (a,b)", str(i2))
+        self.assertEqual("KEY idx_1 (a(10) DESC, b)", str(i2))
         self.assertEqual("UNIQUE KEY idx_2 (b)", str(i3))
         self.assertEqual("[PRIMARY KEY (id), UNIQUE KEY idx_2 (b)]", str([i1,i3]))
 

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 import math
 
+
+DIRECTION_ASC  = 'ASC'
+DIRECTION_DESC = 'DESC'
+ENGINE_INNODB = 'INNODB'
 DEFAULT_CHARSET = 'latin1'
 
 # these sane (default) lengths of string type fields

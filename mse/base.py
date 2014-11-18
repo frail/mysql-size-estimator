@@ -28,11 +28,30 @@ class Table(EqualityMixin):
 
     def add_or_update_index(self, index):
         assert isinstance(index, Index)
-        for column_name in index.columns:
-            if not self.columns.get(column_name):
+        for index_column in index.columns:
+            if not self.columns.get(index_column.name):
                 raise ValueError(
-                    "unable to create index [{}], column [{}] does not exists in table".format(index, column_name))
+                    "unable to create index [{}], column [{}] does not exists in table"
+                    .format(index, index_column.name))
         self.indexes[index.name] = index
+
+
+class IndexColumn(EqualityMixin):
+    def __init__(self, name, length=0, direction=DIRECTION_ASC):
+        self.name = name
+        self.length = length
+        self.direction = direction
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        base = self.name
+        if self.length > 0:
+            base += "({})".format(self.length)
+        if self.direction == DIRECTION_DESC:
+            base += " {}".format(DIRECTION_DESC)
+        return base
 
 
 class Index(EqualityMixin):
@@ -42,7 +61,16 @@ class Index(EqualityMixin):
         assert isinstance(columns, list)
         assert len(columns) >= 1
         self.name = name
-        self.columns = columns
+        self.columns = []
+
+        for col in columns:
+            if isinstance(col, IndexColumn):
+                self.columns.append(col)
+            elif isinstance(col, str):
+                self.columns.append(IndexColumn(col))
+            else:
+                raise ValueError("unknown index column {}".format(col))
+
         self.is_primary = is_primary
         # Overwrite is_unique when it's primary
         self.is_unique = is_primary or is_unique
@@ -51,7 +79,8 @@ class Index(EqualityMixin):
         return self.__str__()
 
     def __str__(self):
-        cols = ",".join(self.columns)
+        col_str = [str(x) for x in self.columns]
+        cols = ", ".join(col_str)
         if self.is_primary:
             return "PRIMARY KEY ({0})".format(cols)
         elif self.is_unique:

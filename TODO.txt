@@ -4,7 +4,6 @@ basics:
 * get rid of print(), a decent logging would be nice
 * add documentation (sphinx)
 * exception handling / custom exceptions
-* should support partial index
 * cli tests
 * estimator tests
 * estimator is not working properly, fixes on unicode logic is necessary

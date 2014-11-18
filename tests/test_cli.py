@@ -6,6 +6,7 @@ else:
     import unittest
 
 import mse
+from mse.base import Column, Index, IndexColumn
 from mse.cli import Cli, CliSQLParseException
 from docopt import docopt, DocoptExit
 
@@ -22,8 +23,8 @@ class TestCli(unittest.TestCase):
         args = docopt(mse.cli.__doc__, ['dummy', '-c', 'id INT', '-i', 'PRIMARY KEY (id)'])
         parsed = Cli(args)
         self.assertEqual("dummy", parsed.table.name)
-        self.assertEqual(mse.base.Column('id', 'INT'), parsed.table.columns.get('id'))
-        self.assertEqual(mse.base.Index('primary', ['id'], is_primary=True), parsed.table.indexes.get('primary'))
+        self.assertEqual(Column('id', 'INT'), parsed.table.columns.get('id'))
+        self.assertEqual(Index('primary', [IndexColumn('id')], is_primary=True), parsed.table.indexes.get('primary'))
 
     def test_dummy_fail_bad_definition(self):
         args1 = docopt(mse.cli.__doc__, ['dummy', '-c', 'id'])

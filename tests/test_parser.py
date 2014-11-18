@@ -6,32 +6,42 @@ else:
     import unittest
 
 from mse.parser import Parser
-from mse.base import Column, Index
+from mse.base import Column, Index, IndexColumn
 
 
 class TestParser(unittest.TestCase):
     def setUp(self):
         self.p = Parser()
 
-    def test_parse_index(self):
+    def test_parse_index_1(self):
         i1 = self.p.parse_index("PRIMARY KEY (`runno`)")
         self.assertEquals("primary", i1.name)
         self.assertTrue(i1.is_primary)
         self.assertTrue(i1.is_unique)
-        self.assertSequenceEqual(["runno"], i1.columns)
-        self.assertEquals(i1, Index("primary", ["runno"], is_unique=True, is_primary=True))
+        self.assertSequenceEqual("runno", i1.columns[0].name)
+        self.assertEquals(i1, Index("primary", [IndexColumn("runno")], is_unique=True, is_primary=True))
 
-        i2 = self.p.parse_index("KEY idx_Name (name),")
+    def test_parse_index_2(self):
+        i2 = self.p.parse_index("KEY idx_Name (name(10) DESC, other_key),")
         self.assertEquals("idx_Name", i2.name)
         self.assertFalse(i2.is_primary)
         self.assertFalse(i2.is_unique)
-        self.assertSequenceEqual(["name"], i2.columns)
+        self.assertSequenceEqual([IndexColumn("name", 10, "DESC"), IndexColumn("other_key")], i2.columns)
 
+
+    def test_parse_index_3(self):
         i3 = self.p.parse_index("unique Key idx_3 (name, id, `a1`),")
         self.assertEquals("idx_3", i3.name)
         self.assertFalse(i3.is_primary)
         self.assertTrue(i3.is_unique)
-        self.assertSequenceEqual(["name", "id", "a1"], i3.columns)
+        self.assertSequenceEqual([IndexColumn("name"), IndexColumn("id"), IndexColumn("a1")], i3.columns)
+
+    def test_parse_index_4(self):
+        i4 = self.p.parse_index("index idx_Name (name),")
+        self.assertEquals("idx_Name", i4.name)
+        self.assertFalse(i4.is_primary)
+        self.assertFalse(i4.is_unique)
+        self.assertSequenceEqual([IndexColumn("name")], i4.columns)
 
     def test_parse_column(self):
         c1 = self.p.parse_column("id int")
@@ -55,7 +65,7 @@ class TestParser(unittest.TestCase):
             "create table `test`.`t2` (`id` INT NOT NULL DEFAULT 0, PRIMARY KEY (`id`)) collate utf8_general_ci ENGINE=\"MyISAM\"")
         self.assertEquals("t2", t2.name)
         self.assertSequenceEqual([Column("id", "int", nullable=False)], list(t2.columns.values()))
-        self.assertSequenceEqual([Index("primary", ['id'], is_primary=True, is_unique=True)], list(t2.indexes.values()))
+        self.assertSequenceEqual([Index("primary", [IndexColumn('id')], is_primary=True, is_unique=True)], list(t2.indexes.values()))
         self.assertEquals("MyISAM", t2.engine)
         self.assertEquals("utf8", t2.charset)
         self.assertEquals("utf8_general_ci", t2.collation)
