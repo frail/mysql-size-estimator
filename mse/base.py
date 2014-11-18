@@ -31,7 +31,7 @@ class Table(EqualityMixin):
         for index_column in index.columns:
             if not self.columns.get(index_column.name):
                 raise ValueError(
-                    "unable to create index [{}], column [{}] does not exists in table"
+                    "unable to create index [{0}], column [{1}] does not exists in table"
                     .format(index, index_column.name))
         self.indexes[index.name] = index
 
@@ -48,9 +48,9 @@ class IndexColumn(EqualityMixin):
     def __str__(self):
         base = self.name
         if self.length > 0:
-            base += "({})".format(self.length)
+            base += "({0})".format(self.length)
         if self.direction == DIRECTION_DESC:
-            base += " {}".format(DIRECTION_DESC)
+            base += " {0}".format(DIRECTION_DESC)
         return base
 
 
@@ -69,7 +69,7 @@ class Index(EqualityMixin):
             elif isinstance(col, str):
                 self.columns.append(IndexColumn(col))
             else:
-                raise ValueError("unknown index column {}".format(col))
+                raise ValueError("unknown index column {0}".format(col))
 
         self.is_primary = is_primary
         # Overwrite is_unique when it's primary
